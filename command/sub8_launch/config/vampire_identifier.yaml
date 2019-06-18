@@ -1,0 +1,18 @@
+# camera_topic          : /camera/front/right/image_rect_color
+# Searching for Red Eyes
+draugr_low_thresh : [160, 0, 0]
+draugr_high_thresh : [255, 100, 100]
+
+# Searching for Two Bodies
+aswang_low_thresh : [50, 10, 0]
+aswang_high_thresh : [140, 70, 40]
+
+# Searching for Brown Body
+vetalas_low_thresh : [50, 10, 0]
+vetalas_high_thresh : [140, 70, 40]
+
+#Searching for Yellow, White Body. 
+jiangshi_low_thresh : [160, 160, 0]
+jiangshi_high_thresh : [255, 255, 140]
+
+debug                 : True
