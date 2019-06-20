@@ -113,22 +113,22 @@ class VampIdent:
                 rospy.logwarn('Invalid dynamic reconfigure: {}'.format(e))
                 return self.last_config
 
-            if self.override
+            if self.override:
                 # Dynamic Values for testing
-                self.lower = np.array(dyn_lower)
-                self.upper = np.array(dyn_upper)
+                self.lower = np.array(self.lower)
+                self.upper = np.array(self.upper)
             else:
                 # Hard Set for use in Competition
-                if goal == 'draugr'
+                if self.goal == 'draugr':
                     self.lower = rospy.get_param('~draugr_low_thresh', [0, 0, 80])
                     self.upper = rospy.get_param('~draugr_high_thresh', [0, 0, 80])
-                else if goal == 'aswang'
+                elif self.goal == 'aswang':
                     self.lower = rospy.get_param('~aswang_low_thresh', [0, 0, 80])
                     self.upper = rospy.get_param('~aswang_high_thresh', [0, 0, 80])
-                else if goal == 'vetalas'
+                elif self.goal == 'vetalas':
                     self.lower = rospy.get_param('~vetalas_low_thresh', [0, 0, 80])
                     self.upper = rospy.get_param('~vetalas_high_thresh', [0, 0, 80])
-                else if goal == 'jiangshi'
+                elif self.goal == 'jiangshi':
                     self.lower = rospy.get_param('~jiangshi_low_thresh', [0, 0, 80])
                     self.upper = rospy.get_param('~jiangshi_high_thresh', [0, 0, 80])
                 else:
@@ -224,7 +224,10 @@ class VampIdent:
         return (self._observations, self._pose_pairs)
 
     def detect(self, c):
-        # initialize the shape name and approximate the contour
+        '''
+        Verify the shape in the masked image is large enough to be a valid target.
+        This changes depending on target Vampire, as does the number of targets we want.  
+        '''
         target = "unidentified"
         peri = cv2.arcLength(c, True)
 
@@ -232,11 +235,7 @@ class VampIdent:
             return target
         approx = cv2.approxPolyDP(c, 0.04 * peri, True)
 
-        if len(approx) == 4:
-            target = "Target Aquisition Successful"
-
-        elif len(approx) == 3 or len(approx) == 5:
-            target = "Partial Target Acquisition"
+        target = "Target Aquisition Successful"
 
         return target
 
@@ -258,10 +257,6 @@ class VampIdent:
     def acquire_targets(self, cv_image):
         # Take in the data and get its dimensions.
         height, width, channels = cv_image.shape
-
-        # Now we generate a color mask to isolate only red in the image. This
-        # is achieved through the thresholds which can be changed in the above
-        # constants.
 
         # create NumPy arrays from the boundaries
         lower = np.array(self.lower, dtype="uint8")
@@ -312,6 +307,8 @@ class VampIdent:
                     except CvBridgeError as e:
                         print(e)
 
+
+                # Grab the largest contour. Generally this is a safe bet but... We may need to tweak this for the three different vampires.
                 peri = cv2.arcLength(c, True)
                 if peri > peri_max:
                     peri_max = peri
@@ -351,8 +348,8 @@ class VampIdent:
 
 
 def main(args):
-    rospy.init_node('torp_vision', anonymous=False)
-    torp_vision()
+    rospy.init_node('vamp_ident', anonymous=False)
+    VampIdent()
 
     try:
         rospy.spin()
