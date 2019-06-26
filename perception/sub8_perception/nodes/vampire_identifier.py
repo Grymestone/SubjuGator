@@ -209,7 +209,7 @@ class VampIdent:
 
         self.clear_old_observations()
         # print('Adding...')
-        if slen(self._observations) == 0 or np.linalg.norm(
+        if len(self._observations) == 0 or np.linalg.norm(
                 self._pose_pairs[-1][0] - pose_pair[0]) > self.min_trans:
             self._observations.append(obs)
             self._pose_pairs.append(pose_pair)
